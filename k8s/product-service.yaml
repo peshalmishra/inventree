@@ -28,20 +28,18 @@ spec:
               value: "5002"
             - name: NODE_ENV
               value: "production"
-            - name: MONGO_URI
+            - name: MONGODB_URI
               valueFrom:
                 secretKeyRef:
                   name: ims-secrets
-                  key: PRODUCT_MONGO_URI       # e.g. mongodb+srv://user:pass@cluster/ims_product
+                  key: PRODUCT_MONGO_URI
           readinessProbe:
-            httpGet:
-              path: /api/v1/products/health
+            tcpSocket:
               port: 5002
             initialDelaySeconds: 10
             periodSeconds: 10
           livenessProbe:
-            httpGet:
-              path: /api/v1/products/health
+            tcpSocket:
               port: 5002
             initialDelaySeconds: 20
             periodSeconds: 20

@@ -42,12 +42,12 @@ services:
 
   frontend:
     build:
-      context: ./frontend
+      context: ./Frontend
     container_name: frontend
     ports:
       - "5173:5173"
     env_file:
-      - ./frontend/.env
+      - ./Frontend/.env
     networks:
       - ims-network
     depends_on:

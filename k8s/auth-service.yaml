@@ -28,25 +28,23 @@ spec:
               value: "5001"
             - name: NODE_ENV
               value: "production"
-            - name: MONGO_URI
+            - name: MONGODB_URI
               valueFrom:
                 secretKeyRef:
                   name: ims-secrets
-                  key: AUTH_MONGO_URI          # e.g. mongodb+srv://user:pass@cluster/ims_auth
-            - name: JWT_SECRET
+                  key: AUTH_MONGO_URI
+            - name: SECRET_KEY
               valueFrom:
                 secretKeyRef:
                   name: ims-secrets
                   key: JWT_SECRET
           readinessProbe:
-            httpGet:
-              path: /api/v1/users/health
+            tcpSocket:
               port: 5001
             initialDelaySeconds: 10
             periodSeconds: 10
           livenessProbe:
-            httpGet:
-              path: /api/v1/users/health
+            tcpSocket:
               port: 5001
             initialDelaySeconds: 20
             periodSeconds: 20
