@@ -73,6 +73,7 @@ docker-compose.override.yml
 # ---------------------------
 kubeconfig
 *.kubeconfig
+k8s/secrets.yaml
 
 # ---------------------------
 # Miscellaneous

@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: frontend
+  template:
+    metadata:
+      labels:
+        app: frontend
+    spec:
+      containers:
+      - name: frontend
+        image: peshal21/ims-frontend:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 5173   # Matches your Dockerfile EXPOSE
+        env:
+          - name: VITE_API_URL
+            value: "http://gateway:5000"
+        resources:
+          requests:
+            cpu: "100m"
+            memory: "128Mi"
+          limits:
+            cpu: "500m"
+            memory: "512Mi"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend
+spec:
+  type: LoadBalancer
+  selector:
+    app: frontend
+  ports:
+    - protocol: TCP
+      port: 5173        # The port you will type in your browser
+      targetPort: 5173  # The port inside your container (Vite dev server)
