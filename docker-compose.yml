@@ -1,0 +1,58 @@
+
+services:
+  gateway:
+    build:
+      context: ./gateway
+    container_name: gateway
+    ports:
+      - "5000:5000"
+    environment:
+      - PORT=5000
+      # Override the local .env settings so Docker routes traffic by container name!
+      - AUTH_SERVICE_URL=http://auth-service:5001
+      - PRODUCT_SERVICE_URL=http://product-service:5002
+      - FRONTEND_URL=http://localhost:5173
+    networks:
+      - ims-network
+    depends_on:
+      - auth-service
+      - product-service
+
+  auth-service:
+    build:
+      context: ./services/auth-service
+    container_name: auth-service
+    ports:
+      - "5001:5001"
+    env_file:
+      - ./services/auth-service/.env
+    networks:
+      - ims-network
+
+  product-service:
+    build:
+      context: ./services/product-service
+    container_name: product-service
+    ports:
+      - "5002:5002"
+    env_file:
+      - ./services/product-service/.env
+    networks:
+      - ims-network
+
+  frontend:
+    build:
+      context: ./frontend
+    container_name: frontend
+    ports:
+      - "5173:5173"
+    env_file:
+      - ./frontend/.env
+    networks:
+      - ims-network
+    depends_on:
+      - gateway
+
+networks:
+  ims-network:
+    driver: bridge

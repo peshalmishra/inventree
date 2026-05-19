@@ -1,0 +1,87 @@
+# ============================================================
+#  Smart Inventory Management System — Root .gitignore
+# ============================================================
+
+# ---------------------------
+# Dependencies
+# ---------------------------
+node_modules/
+.pnp
+.pnp.js
+
+# ---------------------------
+# Environment Variables
+# ---------------------------
+.env
+.env.*
+!.env.example
+!.env.template
+
+# ---------------------------
+# Build Outputs
+# ---------------------------
+dist/
+build/
+out/
+.next/
+.nuxt/
+.output/
+
+# ---------------------------
+# Logs
+# ---------------------------
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# ---------------------------
+# Runtime / OS
+# ---------------------------
+.DS_Store
+Thumbs.db
+*.pem
+
+# ---------------------------
+# IDE / Editor
+# ---------------------------
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# ---------------------------
+# Testing
+# ---------------------------
+coverage/
+.nyc_output/
+*.lcov
+
+# ---------------------------
+# Docker
+# ---------------------------
+docker-compose.override.yml
+
+# ---------------------------
+# Kubernetes
+# ---------------------------
+kubeconfig
+*.kubeconfig
+
+# ---------------------------
+# Miscellaneous
+# ---------------------------
+*.tgz
+*.tar.gz
+.cache/
+.parcel-cache/
+.eslintcache
+.stylelintcache
+.temp/
+tmp/
