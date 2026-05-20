@@ -1,12 +1,26 @@
 import React from "react";
+import { CheckCircle2 } from "lucide-react";
+import { motion } from "framer-motion";
 
-function ShowSuccessMesasge({ children }) {
+function ShowSuccessMesasge({ message, children }) {
   return (
-    <div className="h-full  flex items-center w-full justify-center ">
-      <div className=" text-center border-teal-700 bg-teal-300 p-3 w-1/4 border-2 rounded-md">
-         {children}
+    <motion.div
+      initial={{ opacity: 0, y: -6 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="flex items-start gap-3 px-4 py-3 rounded-xl bg-emerald-500/10 border border-emerald-500/25 text-emerald-400"
+    >
+      <CheckCircle2 size={18} className="flex-shrink-0 mt-0.5" />
+      <div className="flex-1 min-w-0">
+        <p className="text-sm font-medium leading-snug">
+          {message || "Operation completed successfully."}
+        </p>
+        {children && (
+          <div className="mt-1.5 text-xs text-emerald-400/70">
+            {children}
+          </div>
+        )}
       </div>
-    </div>
+    </motion.div>
   );
 }
 

@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
+import { MapPin, FileText, Save, CheckCircle2, AlertCircle } from "lucide-react";
+import axios from "axios";
 import ShowErrorMessage from "../../components/ShowErrorMessage";
 import ShowSuccessMesasge from "../../components/ShowSuccessMesasge";
 import LoadingIndicator from "../../components/LoadingIndicator";
-import axios from "axios";
 import { SERVER_URL } from "../../router";
 
 function EditLocationScreen() {
@@ -11,147 +13,116 @@ function EditLocationScreen() {
   const [isLoading, setLoading] = useState(true);
   const [success, setSuccess] = useState(false);
   const [uploading, setUploading] = useState(false);
-  const [data, setData] = useState({
-    _id: "663c84f0479858cdb4a0ca9c",
-    name: "sector 1",
-    description: "about sector 1 some random content",
-    createdAt: "2024-05-09T08:10:24.852Z",
-    updatedAt: "2024-05-09T08:10:24.852Z",
-    __v: 0,
-  });
+  const [data, setData] = useState({ name: "", description: "" });
   const [isError, setError] = useState("");
 
   useEffect(() => {
     getDataFromApi();
   }, []);
+
   async function getDataFromApi() {
     try {
       setError("");
-
-      const { data } = await axios.get(
-        `${SERVER_URL}/api/v1/location/${params.id}`
-      );
+      const { data } = await axios.get(`${SERVER_URL}/api/v1/location/${params.id}`);
       setData(data);
     } catch (e) {
-      setError(e);
-      console.log(e);
+      setError("Failed to fetch location details.");
+      console.error(e);
     } finally {
       setLoading(false);
     }
   }
 
   function onchangeHandler(e) {
-    e.preventDefault();
-    const name = e.target.name;
-    const value = e.target.value;
-
-    setData({ ...data, [name]: value });
+    const { name, value } = e.target;
+    setData((prev) => ({ ...prev, [name]: value }));
   }
+
   async function handleUpdate(e) {
     e.preventDefault();
+    setError("");
+    setUploading(true);
     try {
-      setError("");
-      setUploading(true);
-
-      const {} = await axios.patch(
-        `${SERVER_URL}/api/v1/location/${params.id}`,
-        data,
-        {
-          withCredentials: true,
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      await axios.patch(`${SERVER_URL}/api/v1/location/${params.id}`, data, {
+        withCredentials: true,
+        headers: { "Content-Type": "application/json" },
+      });
       setSuccess(true);
     } catch (e) {
-      setError(e);
-      console.log(e);
+      setError("Failed to update location.");
+      console.error(e);
     } finally {
       setUploading(false);
     }
   }
 
   return (
-    <div className="p-5 w-full h-full">
+    <div className="p-6 max-w-xl">
+      <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} className="mb-6">
+        <h1 className="text-2xl font-bold text-white">Edit Location</h1>
+        <p className="text-sm text-white/40 mt-1">Modify location parameters</p>
+      </motion.div>
+
       {isLoading && <LoadingIndicator />}
 
-      {isError && (
-        <ShowErrorMessage
-          children={
-            <span className="underline cursor-pointer" onClick={getDataFromApi}>
-              reload
-            </span>
-          }
-        />
-      )}
-      {success && (
-        <ShowSuccessMesasge
-          children={
-            <p>
-              Updated Successfullly{" "}
-              <Link className="underline" to={"/"} replace={true}>
-                goto Home
-              </Link>
-            </p>
-          }
-        />
-      )}
+      <AnimatePresence>
+        {isError && (
+          <div className="mb-4">
+            <ShowErrorMessage
+              message={isError}
+              children={
+                <span className="underline cursor-pointer hover:text-red-300 transition-colors" onClick={getDataFromApi}>
+                  Try Again
+                </span>
+              }
+            />
+          </div>
+        )}
+        {success && (
+          <div className="mb-4">
+            <ShowSuccessMesasge
+              message="Location updated successfully!"
+              children={
+                <Link className="underline text-emerald-300" to="/locations" replace={true}>
+                  Go back to Locations
+                </Link>
+              }
+            />
+          </div>
+        )}
+      </AnimatePresence>
 
-      {data && !isError && (
-        <div className="max-w-lg mx-auto">
-          <form
-            onChange={(e) => onchangeHandler(e)}
-            onSubmit={handleUpdate}
-            className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4"
-          >
-            <div className="mb-4">
-              <label
-                htmlFor="name"
-                className="block text-gray-700 text-sm font-bold mb-2"
-              >
-                Name
-              </label>
-              <input
-                type="text"
-                name="name"
-                id="name"
-                value={data.name}
-                required
-                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-              />
+      {!isLoading && data && (
+        <motion.form onSubmit={handleUpdate} onChange={onchangeHandler}
+          initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
+          className="glass-card p-6 space-y-5">
+
+          <div>
+            <label htmlFor="name" className="block text-xs font-semibold text-white/40 mb-1.5">Location Name *</label>
+            <div className="relative">
+              <MapPin size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-white/25" />
+              <input type="text" name="name" id="name" value={data.name} required
+                placeholder="Location Name" className="input-dark pl-9 w-full" />
             </div>
-            <div className="mb-6">
-              <label
-                htmlFor="desc"
-                className="block text-gray-700 text-sm font-bold mb-2"
-              >
-                Description
-              </label>
-              <input
-                type="text"
-                name="description"
-                id="desc"
-                value={data.description}
-                required
-                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-              />
+          </div>
+
+          <div>
+            <label htmlFor="description" className="block text-xs font-semibold text-white/40 mb-1.5">Description *</label>
+            <div className="relative">
+              <FileText size={14} className="absolute left-3 top-3.5 text-white/25" />
+              <textarea name="description" id="description" value={data.description} required rows={3}
+                placeholder="Location Description" className="input-dark pl-9 w-full resize-none" />
             </div>
-            <div className="flex items-center justify-between">
-              <button
-                disabled={uploading}
-                type="submit"
-                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-              >
-                {uploading
-                  ? "Uploading"
-                  : success
-                  ? "Updated successfully"
-                  : "Update"}
-              </button>
-            </div>
-          </form>
-        </div>
+          </div>
+
+          <div className="pt-2 border-t border-white/[0.06]">
+            <button type="submit" disabled={uploading} className="btn-primary flex items-center gap-2 disabled:opacity-60">
+              {uploading
+                ? <><div className="h-4 w-4 rounded-full border-2 border-white/30 border-t-white animate-spin" /><span>Saving...</span></>
+                : <><Save size={16} /><span>Update Location</span></>}
+            </button>
+          </div>
+        </motion.form>
       )}
     </div>
   );

@@ -1,128 +1,116 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
-import LoadingIndicator from "../../components/LoadingIndicator";
-import ShowErrorMessage from "../../components/ShowErrorMessage";
-import { IoMailOutline } from "react-icons/io5";
-import { FaUser } from "react-icons/fa";
 import { Link, NavLink } from "react-router-dom";
+import { motion } from "framer-motion";
+import { Plus, Tag, User, Mail, Pencil } from "lucide-react";
 import { SERVER_URL } from "../../router";
+
+const Skeleton = ({ className }) => <div className={`skeleton ${className}`} />;
 
 function BrandsScreen() {
   const [isLoading, setLoading] = useState(true);
   const [data, setData] = useState(null);
   const [isError, setError] = useState("");
 
-  useEffect(() => {
-    getDataFromApi();
-  }, []);
+  useEffect(() => { getDataFromApi(); }, []);
+
   async function getDataFromApi() {
     try {
       const { data } = await axios.get(`${SERVER_URL}/api/v1/brands`);
       setData(data);
     } catch (e) {
-      setError(e);
+      setError(e.message);
     } finally {
       setLoading(false);
     }
   }
-  return (
-    <div className="p-5 w-full h-full">
-      <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-semibold">All Brands</h1>
-        <Link
-          to={"new"}
-          className="px-4 py-1 hover:bg-teal-600 hover:text-slate-50 font-semibold text-teal-600 bg-teal-50 border-2 border-teal-600 rounded-md"
-        >
-          Add New Brand
-        </Link>
-      </div>
-      <br />
 
-      {isLoading && <LoadingIndicator />}
+  return (
+    <div className="p-6 space-y-5 max-w-[1400px]">
+      <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-white">Brands</h1>
+          <p className="text-sm text-white/40 mt-1">Manage product manufacturers and brands</p>
+        </div>
+        <Link to="new" className="btn-primary flex items-center gap-2">
+          <Plus size={16} /><span>New Brand</span>
+        </Link>
+      </motion.div>
 
       {isError && (
-        <ShowErrorMessage
-          children={<span className="underline cursor-pointer">reload</span>}
-        />
+        <div className="px-4 py-3 rounded-xl text-sm text-red-400 bg-red-400/10 border border-red-400/20">{isError}</div>
       )}
 
-      {data && (
-        <div className="grid grid-cols-4 gap-4">
-          {data.map((location) => (
-            <div className=" col-span-1">
-              <LoactionCard data={location} />
-            </div>
-          ))}
-        </div>
-      )}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+        {isLoading
+          ? Array(8).fill(0).map((_, i) => (
+            <motion.div key={i} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: i * 0.05 }}>
+              <Skeleton className="h-44 rounded-2xl" />
+            </motion.div>
+          ))
+          : data?.map((brand, i) => (
+            <motion.div key={brand._id}
+              initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}>
+              <BrandCard data={brand} />
+            </motion.div>
+          ))
+        }
+        {!isLoading && data?.length === 0 && (
+          <div className="col-span-full text-center py-16 text-white/30">
+            <Tag size={32} className="mx-auto mb-2 opacity-30" />
+            <p className="text-sm">No brands yet. Add your first brand!</p>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
 
-function LoactionCard({ data }) {
-  return (
-    <div className="bg-white border rounded-md shadow-teal-100  hover:shadow-md hover:shadow-teal-200 transition-transform shadow-sm p-6 relative">
-      <h2 className="text-xl font-semibold">{data.name}</h2>
-      <p className="mt-2 text-gray-600 line-clamp-2">{data.description}</p>
+function BrandCard({ data }) {
+  const actor = data.editedBy || data.createdBy;
+  const label = data.editedBy ? "Edited by" : "Created by";
 
-      {data.editedBy ? (
-        <>
-          <hr className="my-4 border-gray-300" />
-          <div className="flex items-center">
-            <div>
-              <div className="flex justify-between items-center w-full gap-2">
-                <p className="text-gray-600 flex gap-2 items-center line-clamp-1">
-                  <FaUser />
-                  <h3 className="font-semibold line-clamp-1">
-                    {data.editedBy.name}
-                  </h3>
-                </p>
-                <span className="px-3 py-1 line-clamp-1 bg-neutral-200 text-sm rounded-3xl text-teal-800">
-                  Edited By
-                </span>
-              </div>
-              <p className="text-gray-600 flex gap-2 items-center">
-                <IoMailOutline />
-                {data.editedBy.email}
-              </p>
-            </div>
-          </div>
-        </>
-      ) : (
-        data.createdBy && (
-          <>
-            <hr className="my-4 border-gray-300" />
-            <div className="flex items-center">
-              <div>
-                <div className="flex justify-between items-center w-full gap-2">
-                  <p className="text-gray-600 flex gap-2 items-center line-clamp-1">
-                    <FaUser />
-                    <h3 className="font-semibold line-clamp-1">
-                      {data.createdBy.name}
-                    </h3>
-                  </p>
-                  <span className="line-clamp-1 px-3 py-1 bg-neutral-200 text-sm rounded-3xl text-teal-800">
-                    Created By
-                  </span>
-                </div>
-                <p className="text-gray-600 flex gap-2 items-center">
-                  <IoMailOutline />
-                  {data.createdBy.email}
-                </p>
-              </div>
-            </div>
-          </>
-        )
+  return (
+    <div className="glass-card-hover p-5 flex flex-col gap-3 h-full relative group">
+      {/* Edit button */}
+      <NavLink to={`edit/${data._id}`}
+        className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity btn-ghost py-1 px-2 text-xs flex items-center gap-1">
+        <Pencil size={12} />Edit
+      </NavLink>
+
+      {/* Icon + Name */}
+      <div className="flex items-center gap-3">
+        <div className="h-10 w-10 rounded-xl flex items-center justify-center flex-shrink-0 text-lg font-bold"
+          style={{ background: "linear-gradient(135deg, rgba(124,58,237,0.2), rgba(59,130,246,0.1))", border: "1px solid rgba(124,58,237,0.3)" }}>
+          <Tag size={18} className="text-brand-300" />
+        </div>
+        <div className="min-w-0">
+          <h2 className="text-sm font-bold text-white truncate">{data.name}</h2>
+          <span className="badge-purple text-[10px]">Brand</span>
+        </div>
+      </div>
+
+      {data.description && (
+        <p className="text-xs text-white/40 line-clamp-2 flex-1">{data.description}</p>
       )}
 
-      <NavLink
-        to={`edit/${data._id}`}
-        className="absolute top-2 right-2 z-10 bg-teal-100 px-3 py-1 rounded-sm font-semibold text-sm hover:bg-teal-900 hover:text-slate-200"
-      >
-        Edit
-      </NavLink>
+      {actor && (
+        <div className="pt-3 border-t border-white/[0.06] space-y-1">
+          <p className="text-[10px] text-white/25 uppercase tracking-wider">{label}</p>
+          <div className="flex items-center gap-2">
+            <div className="h-6 w-6 rounded-full flex items-center justify-center text-[10px] font-bold flex-shrink-0"
+              style={{ background: "linear-gradient(135deg, #7c3aed, #3b82f6)" }}>
+              {actor.name?.[0]?.toUpperCase()}
+            </div>
+            <div className="min-w-0">
+              <p className="text-xs font-medium text-white/60 truncate">{actor.name}</p>
+              <p className="text-[10px] text-white/30 truncate">{actor.email}</p>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
-  );  
+  );
 }
 
 export default BrandsScreen;

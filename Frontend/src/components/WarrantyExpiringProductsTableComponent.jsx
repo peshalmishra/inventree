@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from "react";
-import EmptyData from "../assets/undraw_empty_re.svg";
 import axios from "axios";
 import { Link } from "react-router-dom";
+import { motion } from "framer-motion";
+import { ShieldAlert, Calendar, Clock, ChevronRight, AlertTriangle } from "lucide-react";
 import { SERVER_URL } from "../router";
+import LoadingIndicator from "./LoadingIndicator";
 
 function WarrantyExpiringProductsTablesComponent({ uid }) {
   const [isLoading, setLoading] = useState(true);
@@ -22,74 +24,70 @@ function WarrantyExpiringProductsTablesComponent({ uid }) {
         },
       });
       setInventoryData(data);
-      setLoading(false);
     } catch (error) {
       console.error("Error fetching inventory data:", error);
       setError("Error fetching inventory data");
+    } finally {
       setLoading(false);
     }
   };
 
-  const calculateMonthsDifference = (date1, date2) => {
-    const diffInMs = new Date(date2) - new Date(date1);
-    return Math.round(diffInMs / (1000 * 60 * 60 * 24 * 30.44)); // Approximate number of days in a month
-  };
-
   return (
-    <div className="-mx-4 sm:-mx-8 px-4 sm:px-8 py-4 overflow-x-auto">
+    <div className="glass-card overflow-hidden">
+      <div className="p-4 border-b border-white/[0.06] flex items-center justify-between">
+        <h3 className="text-sm font-semibold text-white flex items-center gap-2">
+          <ShieldAlert size={16} className="text-amber-400" />
+          Warranty Expiring Soon
+        </h3>
+        <span className="text-[11px] font-medium badge-red">Attention Required</span>
+      </div>
+
       {isLoading ? (
-        <div>Loading...</div>
+        <div className="p-8"><LoadingIndicator /></div>
       ) : isError ? (
-        <div>Error: {isError}</div>
+        <div className="p-6 text-xs text-red-400 bg-red-400/10 text-center">{isError}</div>
       ) : inventoryData.length === 0 ? (
-        <div className="flex items-center justify-center">
-          <img src={EmptyData} alt="Empty Data" />
-          <h3>No data available</h3>
+        <div className="p-12 text-center text-white/30 flex flex-col items-center justify-center gap-2">
+          <AlertTriangle size={24} className="opacity-20" />
+          <p className="text-xs">No items with expiring warranty.</p>
         </div>
       ) : (
-        <div className="inline-block min-w-full shadow-md rounded-lg overflow-hidden">
-          <table className="min-w-full leading-normal">
+        <div className="overflow-x-auto">
+          <table className="w-full table-dark">
             <thead>
-              <tr>
-                <th className="px-5 py-3 border-b-2 border-white bg-gray-100 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
-                  Product
-                </th>
-                <th className="px-5 py-3 border-b-2 border-white bg-gray-100 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
-                  Serial Number
-                </th>
-                <th className="px-5 py-3 border-b-2 border-white bg-gray-100 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
-                  Warranty Months / Purchase Date
-                </th>
-                <th className="px-5 py-3 border-b-2 border-white bg-gray-100 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
-                  Status
-                </th>
-                <th className="px-5 py-3 border-b-2 border-white bg-gray-100 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
-                  Action
-                </th>
+              <tr className="border-b border-white/[0.06] text-[10px]">
+                <th>Product</th>
+                <th>Serial Number</th>
+                <th>Warranty / Date</th>
+                <th>Status</th>
+                <th>Action</th>
               </tr>
             </thead>
             <tbody>
-              {inventoryData.map((item, index) => (
-                <tr key={index}>
-                  <td className="px-5 py-5 border-b border-white text-sm">
-                    {item.title}
-                  </td>
-                  <td className="px-5 py-5 border-b border-white text-sm">
-                    {item.serialNo}
-                  </td>
-                  <td className="px-5 py-5 border-b border-white text-sm">
-                    {item.warrantyMonths} / {item.dateOfPurchase.split("T")[0]}
-                  </td>
-                  <td className="px-5 py-5 border-b border-white text-sm">
-                    {item.history[0].status[0].name}
-                  </td>
-                  <td className="px-5 py-5 border-b border-white text-sm">
-                    <Link to={`/products/history/${item._id}`} className="text-blue-500 hover:underline mr-2">
-                      View
-                    </Link>
-                  </td>
-                </tr>
-              ))}
+              {inventoryData.map((item, index) => {
+                const statusName = item.history?.[0]?.status?.[0]?.name || "unknown";
+                return (
+                  <tr key={index} className="border-b border-white/[0.04] hover:bg-white/[0.01] transition-colors">
+                    <td className="px-4 py-3 text-xs font-semibold text-white/80">{item.title}</td>
+                    <td className="px-4 py-3 text-[11px] font-mono text-white/40">{item.serialNo}</td>
+                    <td className="px-4 py-3 text-xs text-white/50">
+                      <div className="flex items-center gap-1.5">
+                        <Clock size={11} className="text-white/20" />
+                        <span>{item.warrantyMonths}mo</span>
+                        <span className="text-white/25">({item.dateOfPurchase?.split("T")[0]})</span>
+                      </div>
+                    </td>
+                    <td className="px-4 py-3">
+                      <span className="badge-purple text-[10px]">{statusName}</span>
+                    </td>
+                    <td className="px-4 py-3">
+                      <Link to={`/products/history/${item._id}`} className="text-[11px] font-medium text-brand-300 hover:text-white flex items-center gap-0.5 transition-colors">
+                        View <ChevronRight size={12} />
+                      </Link>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>

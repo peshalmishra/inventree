@@ -2,8 +2,14 @@ import React from "react";
 
 function LoadingIndicator() {
   return (
-    <div className="h-full  flex items-center w-full justify-center ">
-      <div className="w-16 aspect-square border-2 border-t-neutral-950 border-b-neutral-950 border-r-neutral-950 animate-spin rounded-full"></div>
+    <div className="flex items-center justify-center w-full h-full py-8">
+      <div
+        className="w-9 h-9 rounded-full animate-spin"
+        style={{
+          border: "2px solid rgba(139, 92, 246, 0.15)",
+          borderTopColor: "#a78bfa",
+        }}
+      />
     </div>
   );
 }

@@ -1,122 +1,92 @@
-import React, { useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
-import ShowErrorMessage from "../../components/ShowErrorMessage";
-import ShowSuccessMesasge from "../../components/ShowSuccessMesasge";
-import LoadingIndicator from "../../components/LoadingIndicator";
+import React, { useState } from "react";
+import { Link } from "react-router-dom";
 import axios from "axios";
+import { motion, AnimatePresence } from "framer-motion";
+import { Tag, FileText, Save, CheckCircle2, AlertCircle } from "lucide-react";
 import { SERVER_URL } from "../../router";
 
 function NewBrandsScreen() {
-  const params = useParams();
   const [success, setSuccess] = useState(false);
   const [uploading, setUploading] = useState(false);
-  const [data, setData] = useState({});
+  const [data, setData] = useState({ name: "", description: "" });
   const [isError, setError] = useState("");
 
   function onchangeHandler(e) {
-    e.preventDefault();
-    const name = e.target.name;
-    const value = e.target.value;
-
-    setData({ ...data, [name]: value });
+    const { name, value } = e.target;
+    setData((prev) => ({ ...prev, [name]: value }));
   }
-  async function handleUpdate(e) {
-    e.preventDefault();
-    try {
-      setError("");
-      setUploading(true);
 
-      const {} = await axios.post(
-        `${SERVER_URL}/api/v1/brands/`,
-        data,
-        {
-          withCredentials: true,
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
+  async function handleSubmit(e) {
+    e.preventDefault();
+    setError("");
+    setUploading(true);
+    try {
+      await axios.post(`${SERVER_URL}/api/v1/brands/`, data, {
+        withCredentials: true,
+        headers: { "Content-Type": "application/json" },
+      });
       setSuccess(true);
+      setData({ name: "", description: "" });
     } catch (e) {
-      setError(e);
-      console.log(e);
+      setError("Failed to create brand. Please try again.");
     } finally {
       setUploading(false);
     }
   }
+
   return (
-    <div className="p-5 w-full h-full">
-      <h1 className="text-2xl font-semibold">Add New Brand </h1>
+    <div className="p-6 max-w-xl">
+      <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} className="mb-6">
+        <h1 className="text-2xl font-bold text-white">New Brand</h1>
+        <p className="text-sm text-white/40 mt-1">Add a new manufacturer or brand</p>
+      </motion.div>
 
-      {isError && (
-        <ShowErrorMessage
-          children={<span className="underline cursor-pointer">reload</span>}
-        />
-      )}
-      {success && (
-        <>
-          <br />
-          <div className="mx-auto text-center border-teal-700 bg-teal-300 p-3 w-1/4 border-2 rounded-md">
-            <p>
-              Updated Successfullly{" "}
-              <Link className="underline" to={"/"} replace={true}>
-                goto Home
-              </Link>
-            </p>
-          </div>
-          <br />
-        </>
-      )}
+      <AnimatePresence>
+        {isError && (
+          <motion.div initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
+            className="mb-4 flex items-center gap-3 px-4 py-3 rounded-xl text-sm text-red-400 bg-red-400/10 border border-red-400/20">
+            <AlertCircle size={16} />{isError}
+          </motion.div>
+        )}
+        {success && (
+          <motion.div initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
+            className="mb-4 flex items-center justify-between gap-3 px-4 py-3 rounded-xl text-sm text-emerald-400 bg-emerald-400/10 border border-emerald-400/20">
+            <div className="flex items-center gap-2"><CheckCircle2 size={16} />Brand created successfully!</div>
+            <Link to="/brands" className="text-xs underline text-emerald-300">View all brands →</Link>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
-      <div className="max-w-lg mx-auto">
-        <form
-          onChange={(e) => onchangeHandler(e)}
-          onSubmit={handleUpdate}
-          className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4"
-        >
-          <div className="mb-4">
-            <label
-              htmlFor="name"
-              className="block text-gray-700 text-sm font-bold mb-2"
-            >
-              Name
-            </label>
-            <input
-              type="text"
-              name="name"
-              id="name"
-              value={data.name}
-              required
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-            />
+      <motion.form onSubmit={handleSubmit} onChange={onchangeHandler}
+        initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
+        className="glass-card p-6 space-y-5">
+
+        <div>
+          <label htmlFor="name" className="block text-xs font-semibold text-white/40 mb-1.5">Brand Name *</label>
+          <div className="relative">
+            <Tag size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-white/25" />
+            <input type="text" name="name" id="name" value={data.name} required
+              placeholder="e.g. Dell, Cisco, HP..." className="input-dark pl-9 w-full" />
           </div>
-          <div className="mb-6">
-            <label
-              htmlFor="desc"
-              className="block text-gray-700 text-sm font-bold mb-2"
-            >
-              Description
-            </label>
-            <input
-              type="text"
-              name="description"
-              id="desc"
-              value={data.description}
-              required
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-            />
+        </div>
+
+        <div>
+          <label htmlFor="description" className="block text-xs font-semibold text-white/40 mb-1.5">Description *</label>
+          <div className="relative">
+            <FileText size={14} className="absolute left-3 top-3.5 text-white/25" />
+            <textarea name="description" id="description" value={data.description} required rows={3}
+              placeholder="Brief description of this brand..." className="input-dark pl-9 w-full resize-none" />
           </div>
-          <div className="flex items-center justify-between">
-            <button
-              disabled={uploading}
-              type="submit"
-              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-            >
-              {uploading ? "Uploading" : success ? "Create new one" : "Upload"}
-            </button>
-          </div>
-        </form>
-      </div>
+        </div>
+
+        <div className="pt-2 border-t border-white/[0.06]">
+          <button type="submit" disabled={uploading} className="btn-primary flex items-center gap-2 disabled:opacity-60">
+            {uploading
+              ? <><div className="h-4 w-4 rounded-full border-2 border-white/30 border-t-white animate-spin" /><span>Saving...</span></>
+              : <><Save size={16} /><span>Create Brand</span></>}
+          </button>
+        </div>
+      </motion.form>
     </div>
   );
 }

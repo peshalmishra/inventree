@@ -1,72 +1,87 @@
 import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import adminLogo from "../assets/admin-logo.svg";
-import userLogo from "../assets/user-logo.svg";
-import axios from "axios";
+import { useLocation, useNavigate } from "react-router-dom";
+import { Search, Bell, ChevronRight, Menu } from "lucide-react";
+import { motion } from "framer-motion";
 
-function HeaderBar({ user }) {
-  const [showMenu, setShowMenu] = useState(false);
-  const navigator = useNavigate();
+const routeLabels = {
+  "/": "Dashboard",
+  "/products": "Products",
+  "/products/new": "New Product",
+  "/brands": "Brands",
+  "/brands/new": "New Brand",
+  "/locations": "Locations",
+  "/locations/new": "New Location",
+  "/users": "User Management",
+};
 
-  const handleMenuClick = () => {
-    setShowMenu(!showMenu);
-  };
-
-  const [isLoading, setLoading] = useState(false);
+function HeaderBar({ user, onToggleSidebar }) {
+  const location = useLocation();
+  const [searchFocused, setSearchFocused] = useState(false);
+  const pageTitle = routeLabels[location.pathname] ?? "Inventree";
 
   return (
-    <>
-      {isLoading && (
-        <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-gray-800 bg-opacity-50 z-50">
-          <div className="w-16 h-16 border-4 border-t-gray-400 border-b-gray-400 border-r-transparent rounded-full animate-spin"></div>
-          <h2 className="text-white ml-2">Loading please wait...</h2>
+    <header
+      className="fixed top-0 right-0 left-0 z-30 flex items-center justify-between px-6 h-14 border-b border-white/[0.06]"
+      style={{ background: "rgba(10,10,15,0.85)", backdropFilter: "blur(12px)" }}
+    >
+      {/* Left: toggle + breadcrumb */}
+      <div className="flex items-center gap-3">
+        <button
+          onClick={onToggleSidebar}
+          className="p-1.5 rounded-lg text-white/40 hover:text-white hover:bg-white/5 transition-colors"
+          id="sidebar-toggle-btn"
+        >
+          <Menu size={18} />
+        </button>
+        <div className="flex items-center gap-1.5 text-sm">
+          <span className="text-white/30">Inventree</span>
+          <ChevronRight size={12} className="text-white/20" />
+          <span className="text-white/80 font-medium">{pageTitle}</span>
         </div>
-      )}
-      {!isLoading && (
-        <header className="bg-gray-800">
-          <div className="px-6 py-3 bg-white shadow-md grid grid-cols-10 fixed top-0 right-0 left-0 z-10 items-center">
-            <h1 className="text-xl font-semibold col-span-2">
-              Inventory Management
-            </h1>
-            <div className="col-span-6"></div>
-            <div className="col-span-2 flex items-center justify-end">
-              <div className="flex items-center">
-                <img
-                  src={user.role === "user" ? userLogo : adminLogo}
-                  alt="User Logo"
-                  className="h-10 w-10 rounded-full border-4 border-green-600 bg-green-300 p-1"
-                />
-                <div className="ml-3">
-                  <h3 className="text-lg text-neutral-900 font-semibold">
-                    {user.name}
-                  </h3>
-                  <span className="text-sm text-neutral-500">{user.email}</span>
-                </div>
-              </div>
-              <button
-                className="ml-4 text-neutral-100 hover:text-white"
-                onClick={handleMenuClick}
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-6 w-6"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M4 6h16M4 12h16m-7 6h7"
-                  />
-                </svg>
-              </button>
+      </div>
+
+      {/* Center: Search */}
+      <div className="hidden md:flex items-center">
+        <motion.div
+          animate={{ width: searchFocused ? 300 : 220 }}
+          transition={{ duration: 0.2 }}
+          className="relative"
+        >
+          <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-white/30" />
+          <input
+            type="text"
+            placeholder="Search... (⌘K)"
+            onFocus={() => setSearchFocused(true)}
+            onBlur={() => setSearchFocused(false)}
+            className="input-dark pl-9 py-1.5 text-xs w-full"
+            id="global-search-input"
+          />
+        </motion.div>
+      </div>
+
+      {/* Right: notifications + user */}
+      <div className="flex items-center gap-3">
+        <button className="relative p-1.5 rounded-lg text-white/40 hover:text-white hover:bg-white/5 transition-colors" id="notifications-btn">
+          <Bell size={16} />
+          <span className="absolute top-0.5 right-0.5 h-1.5 w-1.5 rounded-full bg-brand-400" />
+        </button>
+
+        {user && (
+          <div className="flex items-center gap-2 pl-3 border-l border-white/[0.08]">
+            <div
+              className="h-7 w-7 rounded-full flex items-center justify-center text-xs font-bold text-white flex-shrink-0"
+              style={{ background: "linear-gradient(135deg, #7c3aed, #3b82f6)" }}
+            >
+              {user.name?.[0]?.toUpperCase()}
+            </div>
+            <div className="hidden sm:block">
+              <p className="text-xs font-semibold text-white/80 leading-none">{user.name}</p>
+              <p className="text-[10px] text-white/40 leading-none mt-0.5">{user.email}</p>
             </div>
           </div>
-        </header>
-      )}
-    </>
+        )}
+      </div>
+    </header>
   );
 }
 

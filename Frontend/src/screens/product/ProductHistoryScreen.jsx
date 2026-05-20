@@ -1,22 +1,10 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
+import { Link, useParams } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
+import { Clock, Info, Calendar, ArrowLeft, History, Package } from "lucide-react";
 import LoadingIndicator from "../../components/LoadingIndicator";
 import ShowErrorMessage from "../../components/ShowErrorMessage";
-import { IoMailOutline } from "react-icons/io5";
-import { FaUser } from "react-icons/fa";
-import { Link, NavLink } from "react-router-dom";
-import { useParams } from "react-router-dom";
-
-import { useCallback } from "react";
-import ReactFlow, {
-  addEdge,
-  ConnectionLineType,
-  Panel,
-  useNodesState,
-  useEdgesState,
-} from "reactflow";
-import dagre from "dagre";
-import { ProductRow } from "./ProductsScreen";
 import { SERVER_URL } from "../../router";
 
 function ProductHistoryScreen() {
@@ -28,180 +16,164 @@ function ProductHistoryScreen() {
   useEffect(() => {
     getDataFromApi();
   }, []);
+
   async function getDataFromApi() {
     try {
+      setLoading(true);
+      setError("");
       const { data } = await axios.get(
         `${SERVER_URL}/api/v1/products/${params.id}/history`
       );
-      // console.log(data);
       setData(data);
     } catch (e) {
-      console.log(e);
-      setError(e);
+      console.error(e);
+      setError("Failed to fetch product history details.");
     } finally {
       setLoading(false);
     }
   }
-  console.log(productData?.history);
+
   return (
-    <div>
-      <div className="p-5 w-full h-full">
-        <div className="flex justify-between items-center">
-          <h1 className="text-2xl font-semibold">Product Information</h1>
+    <div className="p-6 space-y-6 max-w-[1400px]">
+      <Link to="/products" className="btn-ghost inline-flex items-center gap-2 text-xs">
+        <ArrowLeft size={14} /> Back to products
+      </Link>
+
+      <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-white flex items-center gap-2">
+            <History size={22} className="text-brand-400" />
+            Product Details & History
+          </h1>
+          <p className="text-sm text-white/40 mt-1">Audit log and lifecycle tracing</p>
         </div>
-        <br />
+      </motion.div>
 
-        {isLoading && (
-          <div className="h-screen">
-            <LoadingIndicator />
-          </div>
-        )}
+      {isLoading && <LoadingIndicator />}
 
+      <AnimatePresence>
         {isError && (
-          <div className="h-screen">
-            <ShowErrorMessage
-              children={
-                <span
-                  className="underline cursor-pointer"
-                  onClick={getDataFromApi}
-                >
-                  reload
-                </span>
-              }
-            />
-          </div>
+          <ShowErrorMessage
+            message={isError}
+            children={
+              <span className="underline cursor-pointer hover:text-red-300 transition-colors" onClick={getDataFromApi}>
+                Retry
+              </span>
+            }
+          />
         )}
+      </AnimatePresence>
 
-        <div className="border rounded-md border-neutral-700">
-          <div className="overflow-x-auto">
-            <table className="table-auto w-full border-collapse">
-              <thead className="border-b text-left">
-                <tr>
-                  <th className="px-4 py-2">DETAILS</th>
-                  <th className="px-4 py-2">SERIAL NUMBER</th>
-                  <th className="px-4 py-2">USED BY</th>
-                  <th className="px-4 py-2">isPart</th>
-                  <th className="px-4 py-2">RACKMOUNTABLE</th>
-                  <th className="px-4 py-2">DATE OF PURCHASE</th>
-                  <th className="px-4 py-2">MODEL</th>
-                  <th className="px-4 py-2">WARRANTY</th>
-                  <th className="px-4 py-2">MANUFACTURER</th>
-                </tr>
-              </thead>
-              <tbody>
-                {isLoading ? (
-                  <tr>
-                    <td colSpan="5" className="px-4 py-2 text-center">
-                      <LoadingIndicator />
-                    </td>
+      {!isLoading && productData && (
+        <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
+          {/* General specs section */}
+          <div className="glass-card overflow-hidden">
+            <div className="px-5 py-4 border-b border-white/[0.06] bg-white/[0.01]">
+              <h2 className="text-sm font-semibold text-white/80 flex items-center gap-1.5">
+                <Info size={14} className="text-brand-400" /> Product Specifications
+              </h2>
+            </div>
+            <div className="overflow-x-auto">
+              <table className="w-full table-dark">
+                <thead>
+                  <tr className="border-b border-white/[0.06]">
+                    <th>Product</th>
+                    <th>Serial Number</th>
+                    <th>Used By</th>
+                    <th>Model</th>
+                    <th>Manufacturer</th>
+                    <th>Warranty</th>
+                    <th>Flags</th>
                   </tr>
-                ) : (
-                  <tr className="border-b hover:bg-teal-50 hover:text-teal-700">
-                    <td className="px-4 py-2 flex gap-3 items-center">
-                      <div className="px-4 py-2 flex flex-col">
-                        <h5 className="text-lg font-semibold text-zinc-800">
-                          {productData.title}
-                        </h5>
-                        <p className="text-neutral-600  line-clamp-1  text-sm">
-                          {productData.description}
-                        </p>
+                </thead>
+                <tbody>
+                  <tr className="border-b border-white/[0.04]">
+                    <td className="px-4 py-3">
+                      <div>
+                        <p className="text-sm font-semibold text-white/80">{productData.title}</p>
+                        <p className="text-xs text-white/30 mt-0.5 max-w-[250px] truncate">{productData.description}</p>
                       </div>
                     </td>
-                    <td className="px-4 py-2 text-neutral-700 font-semibold text-sm">
-                      {productData.serialNo}
+                    <td className="px-4 py-3 text-xs font-mono text-white/60">{productData.serialNo}</td>
+                    <td className="px-4 py-3 text-xs text-white/60">{productData.user || "—"}</td>
+                    <td className="px-4 py-3 text-xs text-white/60">{productData.model}</td>
+                    <td className="px-4 py-3 text-xs text-white/60">{productData.manufacturer?.name || "—"}</td>
+                    <td className="px-4 py-3">
+                      <span className="badge-purple">{productData.warrantyMonths}mo</span>
                     </td>
-                    <td className="px-4 py-2 text-neutral-700 font-semibold text-sm">
-                      {productData.user}
-                    </td>
-                    <td className="px-4 py-2 text-neutral-700 font-semibold text-sm">
-                      {productData.isPart ? "TRUE" : "FALSE"}
-                    </td>
-                    <td className="px-4 py-2 text-neutral-700 font-semibold text-sm">
-                      {productData.rackMountable ? "TRUE" : "FALSE"}
-                    </td>
-                    <td className="px-4 py-2 text-neutral-700 font-semibold text-sm">
-                      {productData.dateOfPurchase.split("T")[0]}
-                    </td>
-                    <td className="px-4 py-2 text-neutral-700 font-semibold text-sm">
-                      {productData.model}
-                    </td>
-                    <td className="px-4 py-2 text-neutral-700 font-semibold text-sm">
-                      {productData.warrantyMonths}
-                    </td>
-                    <td className="px-4 py-2 text-neutral-700 font-semibold text-sm">
-                      {productData.manufacturer.name}
+                    <td className="px-4 py-3">
+                      <div className="flex gap-1">
+                        {productData.isPart && <span className="badge-green">Part</span>}
+                        {productData.rackMountable && <span className="badge-yellow">Rack</span>}
+                      </div>
                     </td>
                   </tr>
-                )}
-              </tbody>
-            </table>
+                </tbody>
+              </table>
+            </div>
           </div>
-        </div>
 
-        <br />
-        <div className="flex justify-between items-center">
-          <h1 className="text-2xl font-semibold">Product History</h1>
-        </div>
-        <br />
-
-        {productData && (
-          <HistoryTable historyInformation={productData?.history} />
-        )}
-      </div>
+          {/* History details section */}
+          <div className="glass-card overflow-hidden">
+            <div className="px-5 py-4 border-b border-white/[0.06] bg-white/[0.01]">
+              <h2 className="text-sm font-semibold text-white/80 flex items-center gap-1.5">
+                <Clock size={14} className="text-brand-400" /> State Transitions Log
+              </h2>
+            </div>
+            {productData.history && productData.history.length > 0 ? (
+              <HistoryTable historyInformation={productData.history} />
+            ) : (
+              <div className="p-8 text-center text-white/30 text-sm">
+                No state transitions recorded.
+              </div>
+            )}
+          </div>
+        </motion.div>
+      )}
     </div>
   );
 }
+
 const HistoryTable = ({ historyInformation }) => {
   return (
-    <div className="border rounded-md border-neutral-700">
-      <div className="overflow-x-auto">
-        <table className="table-auto w-full border-collapse">
-          <thead className="border-b text-left">
-            <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Location
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Description
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Status
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Date
-              </th>
+    <div className="overflow-x-auto">
+      <table className="w-full table-dark">
+        <thead>
+          <tr className="border-b border-white/[0.06]">
+            <th>Location</th>
+            <th>Location Description</th>
+            <th>Status</th>
+            <th>Change Date</th>
+          </tr>
+        </thead>
+        <tbody>
+          {historyInformation.map((history) => (
+            <tr key={history._id} className="border-b border-white/[0.04] hover:bg-white/[0.01] transition-colors">
+              <td className="px-4 py-3 text-sm font-semibold text-white/80">{history.location?.name || "—"}</td>
+              <td className="px-4 py-3 text-xs text-white/40 max-w-[300px] truncate">{history.location?.description || "—"}</td>
+              <td className="px-4 py-3">
+                <div className="space-y-1">
+                  {history.status.map((status, index) => (
+                    <span key={index} className="inline-block badge-purple text-[10px] mr-1">
+                      {status.name}
+                    </span>
+                  ))}
+                </div>
+              </td>
+              <td className="px-4 py-3">
+                <div className="space-y-1 text-xs text-white/40">
+                  {history.status.map((status, index) => (
+                    <div key={index} className="flex items-center gap-1">
+                      <Calendar size={11} className="text-white/20" />
+                      <span>{new Date(status.date).toLocaleDateString()}</span>
+                    </div>
+                  ))}
+                </div>
+              </td>
             </tr>
-          </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
-            {historyInformation.map((history) => (
-              <tr key={history._id}>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  {history.location.name}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  {history.location.description}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  {history.status.map((status, index) => (
-                    <div key={index} className="flex items-center">
-                      <span className="mr-2">{status.name}</span>
-                    </div>
-                  ))}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  {history.status.map((status, index) => (
-                    <div key={index} className="flex items-center">
-                      <span className="mr-2">
-                        {new Date(status.date).toLocaleDateString()}
-                      </span>
-                    </div>
-                  ))}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 };

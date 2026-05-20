@@ -1,53 +1,45 @@
-import React, { useState } from "react";
-import { IoIosLogOut } from "react-icons/io";
-import LoadingIndicator from "./LoadingIndicator";
-import axios from "axios";
+import React from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import { LogOut } from "lucide-react";
 import { SERVER_URL } from "../router";
+import { motion, AnimatePresence } from "framer-motion";
 
-function LogoutButton() {
-  const [isLoading, setLoading] = useState(false);
-  const navigator = useNavigate();
+function LogoutButton({ collapsed }) {
+  const navigate = useNavigate();
 
   const handleLogout = async () => {
     try {
-      setLoading(true);
-      const { data, status } = await axios.get(
-        `${SERVER_URL}/api/v1/users/logout`,
-        {
-          withCredentials: true,
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-
-      if (status === 200) {
-        navigator("/", { replace: true });
-        window.location.reload();
-      }
-    } catch (error) {
-      console.error("Something went wrong:", error);
-    } finally {
-      setLoading(false);
+      await axios.get(`${SERVER_URL}/api/v1/users/logout`, {
+        withCredentials: true,
+      });
+      navigate("/auth");
+    } catch (e) {
+      console.error(e);
+      navigate("/auth");
     }
   };
+
   return (
     <button
       onClick={handleLogout}
-      // to={"/admin/settings"}
-      className={`${
-        isLoading && "animate-pulse"
-      } flex items-center justify-between px-4 border-t border-b hover:bg-red-700 bg-red-400 font-semibold   text-white py-2 `}
+      title={collapsed ? "Logout" : undefined}
+      className={`w-full flex items-center gap-3 px-3 py-2 rounded-xl text-sm font-medium text-white/40 transition-all duration-200 hover:bg-red-500/10 hover:text-red-400 ${collapsed ? "justify-center" : ""}`}
     >
-      Log out{" "}
-      {isLoading ? (
-        <span className="w-5 h-5 ">
-          <LoadingIndicator />
-        </span>
-      ) : (
-        <IoIosLogOut />
-      )}
+      <LogOut size={16} className="flex-shrink-0" />
+      <AnimatePresence>
+        {!collapsed && (
+          <motion.span
+            initial={{ opacity: 0, width: 0 }}
+            animate={{ opacity: 1, width: "auto" }}
+            exit={{ opacity: 0, width: 0 }}
+            transition={{ duration: 0.2 }}
+            className="overflow-hidden whitespace-nowrap"
+          >
+            Log out
+          </motion.span>
+        )}
+      </AnimatePresence>
     </button>
   );
 }
