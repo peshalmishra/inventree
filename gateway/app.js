@@ -17,10 +17,12 @@ process.on("unhandledRejection", (reason) => {
 
 const app = express();
 
-// Global CORS configuration for the gateway
+// Strip trailing slash to prevent CORS origin mismatch
+const FRONTEND_URL = (process.env.FRONTEND_URL || "").replace(/\/$/, "");
+
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL || true,
+    origin: FRONTEND_URL || true,
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
     credentials: true,
   })
