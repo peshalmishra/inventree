@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
+  <defs>
+    <linearGradient id="brand-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#7c3aed" />
+      <stop offset="100%" stop-color="#3b82f6" />
+    </linearGradient>
+  </defs>
+  <!-- Background Rounded Rect -->
+  <rect width="32" height="32" rx="8" fill="#0f0f15" />
+  <!-- Inner gradient path representing a box & leaf/tree -->
+  <path d="M16 6 L25 11 L25 21 L16 26 L7 21 L7 11 Z" fill="none" stroke="url(#brand-grad)" stroke-width="2" stroke-linejoin="round" />
+  <path d="M16 6 L16 26" stroke="url(#brand-grad)" stroke-width="1.5" />
+  <path d="M16 16 L25 11" stroke="url(#brand-grad)" stroke-width="1.5" />
+  <path d="M16 16 L7 11" stroke="url(#brand-grad)" stroke-width="1.5" />
+  <!-- Branch Leaf Nodes -->
+  <circle cx="16" cy="11" r="2.5" fill="#7c3aed" />
+  <circle cx="20.5" cy="13.5" r="2" fill="#5b5df8" />
+  <circle cx="11.5" cy="13.5" r="2" fill="#3b82f6" />
+</svg>
