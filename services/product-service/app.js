@@ -32,6 +32,11 @@ app.use(express.urlencoded({ extended: true }));
 
 connectdb();
 
+// health check endpoint (keep before other routes)
+app.get('/health', (req, res) => {
+  res.status(200).json({ status: 'ok' });
+});
+
 app.use("/api/v1/products", productRouter);
 app.use("/api/v1/brands", companyRouter);
 app.use("/api/v1/location", locationRouter);

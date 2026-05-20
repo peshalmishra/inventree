@@ -28,6 +28,11 @@ app.use(express.urlencoded({ extended: true }));
 
 connectdb();
 
+// health check endpoint (keep before other routes)
+app.get('/health', (req, res) => {
+  res.status(200).json({ status: 'ok' });
+});
+
 // The gateway proxies /api/v1/users to here, but without stripping the prefix,
 // so the auth service must handle /api/v1/users
 app.use("/api/v1/users", userRouter);

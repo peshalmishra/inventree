@@ -28,6 +28,11 @@ app.use(
   })
 );
 
+// health check endpoint (keep before proxy routes)
+app.get('/health', (req, res) => {
+  res.status(200).json({ status: 'ok' });
+});
+
 // Proxies
 app.use(
   "/api/v1/users",
