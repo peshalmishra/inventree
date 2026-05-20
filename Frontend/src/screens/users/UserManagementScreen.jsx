@@ -28,6 +28,7 @@ function UserManagementScreen() {
       const { data } = await axios.get(
         `${SERVER_URL}/api/v1/users/all`,
         {
+          withCredentials: true,
           params: {
             page: currentPage,
             itemsPerPage,
