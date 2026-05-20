@@ -68,7 +68,7 @@ export const login = async (req, res, next) => {
 
     sendcookie(user, res, `welcome back,${user.name}`, 201);
   } catch (e) {
-    throw next(e);
+    next(e);
   }
 };
 
@@ -88,7 +88,7 @@ export const register = async (req, res, next) => {
 
     sendcookie(user, res, "successfully registered", 201);
   } catch (e) {
-    throw next(e);
+    next(e);
   }
 };
 
@@ -105,7 +105,7 @@ export const getMyprofile = async (req, res, next) => {
       user: user,
     });
   } catch (e) {
-    throw next(e);
+    next(e);
   }
 };
 
@@ -124,6 +124,6 @@ export const logout = async (req, res, next) => {
         user: req.user,
       });
   } catch (e) {
-    throw next(e);
+    next(e);
   }
 };

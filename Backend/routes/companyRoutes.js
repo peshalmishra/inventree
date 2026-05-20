@@ -12,7 +12,7 @@ companyRouter.get("/", async (req, res, next) => {
 
     return res.status(200).json(locations || []);
   } catch (e) {
-    throw next(e);
+    next(e);
   }
 });
 companyRouter.get("/:id", async (req, res, next) => {
@@ -23,7 +23,7 @@ companyRouter.get("/:id", async (req, res, next) => {
 
     return res.status(200).json(locations);
   } catch (e) {
-    throw next(e);
+    next(e);
   }
 });
 
@@ -42,7 +42,7 @@ companyRouter.patch("/:id", isAuthenticated, async (req, res, next) => {
 
     return res.status(200).json({ message: "Success" });
   } catch (e) {
-    throw next(e);
+    next(e);
   }
 });
 
@@ -60,7 +60,7 @@ companyRouter.post("/", isAuthenticated, async (req, res, next) => {
     await location.save();
     return res.status(200).json({ message: "Success" });
   } catch (e) {
-    throw next(e);
+    next(e);
   }
 });
 

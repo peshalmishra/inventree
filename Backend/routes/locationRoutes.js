@@ -34,7 +34,7 @@ locationRouter.patch("/:id", isAuthenticated, async (req, res, next) => {
 
     return res.status(200).json();
   } catch (e) {
-    throw next(e);
+    next(e);
   }
 });
 
@@ -51,7 +51,7 @@ locationRouter.post("/", isAuthenticated, async (req, res, next) => {
     await location.save();
     return res.status(200).json({ message: "Success" });
   } catch (e) {
-    throw next(e);
+    next(e);
   }
 });
 

@@ -22,11 +22,17 @@ function LoginScreen() {
     setLoading(true);
     setError("");
     try {
-      const { status } = await axios.post(`${SERVER_URL}/api/v1/users/login`, formData, {
+      const { data, status } = await axios.post(`${SERVER_URL}/api/v1/users/login`, formData, {
         withCredentials: true,
       });
-      if (status === 201) navigate("/");
-      else setError("Invalid credentials. Please try again.");
+      if (status === 201) {
+        if (data?.token) {
+          localStorage.setItem("token", data.token);
+        }
+        navigate("/");
+      } else {
+        setError("Invalid credentials. Please try again.");
+      }
     } catch (err) {
       if (!err.response) {
         setError("Network error. Unable to connect to the server.");

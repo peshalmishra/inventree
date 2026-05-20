@@ -13,9 +13,11 @@ function LogoutButton({ collapsed }) {
       await axios.get(`${SERVER_URL}/api/v1/users/logout`, {
         withCredentials: true,
       });
+      localStorage.removeItem("token");
       navigate("/auth");
     } catch (e) {
       console.error(e);
+      localStorage.removeItem("token");
       navigate("/auth");
     }
   };

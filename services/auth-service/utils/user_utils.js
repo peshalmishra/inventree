@@ -13,5 +13,6 @@ export const sendcookie = (user, res, message, statuscode = 200) => {
     .json({
       success: true,
       message,
+      token,
     });
 };

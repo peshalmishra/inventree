@@ -15,7 +15,12 @@ function DashBoardLayout() {
   const [collapsed, setCollapsed] = useState(false);
 
   useEffect(() => {
-    fetchUserInfo();
+    const token = localStorage.getItem("token");
+    if (token) {
+      fetchUserInfo();
+    } else {
+      setLoading(false);
+    }
   }, []);
 
   const fetchUserInfo = async () => {
