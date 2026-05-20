@@ -45,3 +45,12 @@ jobs:
           context: ./Frontend
           push: true
           tags: peshal21/ims-frontend:latest
+
+      - name: Trigger Render redeploy — Gateway
+        run: curl -s "${{ secrets.RENDER_GATEWAY_HOOK }}"
+
+      - name: Trigger Render redeploy — Auth Service
+        run: curl -s "${{ secrets.RENDER_AUTH_HOOK }}"
+
+      - name: Trigger Render redeploy — Product Service
+        run: curl -s "${{ secrets.RENDER_PRODUCT_HOOK }}"
