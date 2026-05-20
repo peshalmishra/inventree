@@ -27,14 +27,17 @@ function BrandsScreen() {
 
   return (
     <div className="p-6 space-y-5 max-w-[1400px]">
-      <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} className="flex items-center justify-between">
+      <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} className="glass-card p-5 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold text-white">Brands</h1>
           <p className="text-sm text-white/40 mt-1">Manage product manufacturers and brands</p>
         </div>
-        <Link to="new" className="btn-primary flex items-center gap-2">
-          <Plus size={16} /><span>New Brand</span>
-        </Link>
+        <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+          <div className="badge-green px-3 py-2 text-xs">{isLoading ? "Loading..." : `${data?.length ?? 0} brands`}</div>
+          <Link to="new" className="btn-primary flex items-center gap-2">
+            <Plus size={16} /><span>New Brand</span>
+          </Link>
+        </div>
       </motion.div>
 
       {isError && (

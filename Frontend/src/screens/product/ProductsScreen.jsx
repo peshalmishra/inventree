@@ -15,6 +15,7 @@ function ProductsScreen() {
   const [products, setProducts] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [error, setError] = useState(null);
+  const shownItemCount = products.length;
 
   useEffect(() => { fetchData(); }, [currentPage, itemsPerPage, searchTerm]);
 
@@ -33,18 +34,36 @@ function ProductsScreen() {
   }
 
   return (
-    <div className="p-6 space-y-5 max-w-[1400px]">
-      <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} className="flex items-center justify-between">
+    <div className="p-6 space-y-6 max-w-[1400px]">
+      <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} className="grid gap-4 lg:grid-cols-[1.5fr_auto] items-center">
         <div>
           <h1 className="text-2xl font-bold text-white">Products</h1>
           <p className="text-sm text-white/40 mt-1">Manage your inventory items</p>
         </div>
-        <Link to="new" className="btn-primary flex items-center gap-2">
+        <Link to="new" className="btn-primary flex items-center gap-2 justify-center sm:justify-end">
           <Plus size={16} /><span>New Product</span>
         </Link>
       </motion.div>
 
-      <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="glass-card overflow-hidden">
+      <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div className="glass-card p-5">
+          <p className="text-xs uppercase tracking-[0.32em] text-white/30 mb-3">Showing</p>
+          <p className="text-3xl font-bold text-white">{shownItemCount}</p>
+          <p className="text-sm text-white/40 mt-2">Products on this page</p>
+        </div>
+        <div className="glass-card p-5">
+          <p className="text-xs uppercase tracking-[0.32em] text-white/30 mb-3">Pages</p>
+          <p className="text-3xl font-bold text-white">{totalPages || "—"}</p>
+          <p className="text-sm text-white/40 mt-2">Total inventory pages</p>
+        </div>
+        <div className="glass-card p-5">
+          <p className="text-xs uppercase tracking-[0.32em] text-white/30 mb-3">Items per page</p>
+          <p className="text-3xl font-bold text-white">{itemsPerPage}</p>
+          <p className="text-sm text-white/40 mt-2">Current page size</p>
+        </div>
+      </motion.div>
+
+      <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="glass-panel overflow-hidden">
         {/* Toolbar */}
         <div className="flex items-center gap-3 p-4 border-b border-white/[0.06]">
           <div className="relative flex-1 max-w-xs">
