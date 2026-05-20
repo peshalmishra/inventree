@@ -27,8 +27,12 @@ function LoginScreen() {
       });
       if (status === 201) navigate("/");
       else setError("Invalid credentials. Please try again.");
-    } catch {
-      setError("Invalid email or password.");
+    } catch (err) {
+      if (!err.response) {
+        setError("Network error. Unable to connect to the server.");
+      } else {
+        setError(err.response.data?.message || "Invalid email or password.");
+      }
     } finally {
       setLoading(false);
     }

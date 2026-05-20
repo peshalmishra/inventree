@@ -24,8 +24,12 @@ function SignupScreen() {
       const { status } = await axios.post(`${SERVER_URL}/api/v1/users/new`, formData);
       if (status === 201) navigate("/auth", { replace: true });
       else setError("Something went wrong. Please try again.");
-    } catch {
-      setError("An account with this email already exists.");
+    } catch (err) {
+      if (!err.response) {
+        setError("Network error. Unable to connect to the server.");
+      } else {
+        setError(err.response.data?.message || "Something went wrong. Please try again.");
+      }
     } finally {
       setLoading(false);
     }
