@@ -13,11 +13,11 @@ const router = express.Router();
 
 router.post("/new", register);
 router.post("/login", login);
-router.get("/logout", logout);
+router.get("/logout", isAuthenticated, logout);
 
-router.get("/all", getAllUsers);
+router.get("/all", isAuthenticated, getAllUsers);
 
-router.patch("/chage-role", isAuthenticated, async (req, res) => {
+router.patch("/change-role", isAuthenticated, async (req, res) => {
   const { targetUserId, role } = req.body;
   const user = req.user;
   if (!targetUserId) {
@@ -25,7 +25,7 @@ router.patch("/chage-role", isAuthenticated, async (req, res) => {
   }
   if (user.role !== "admin") {
     return res
-      .status(400)
+      .status(403)
       .json({ message: "Not authorized to make this call" });
   }
 

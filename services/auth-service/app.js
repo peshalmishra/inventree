@@ -8,6 +8,16 @@ import userRouter from "./routes/user_routes.js";
 
 dotenv.config();
 
+// Catch any uncaught startup errors so Render logs show the real reason
+process.on("uncaughtException", (err) => {
+  console.error("[uncaughtException]", err);
+  process.exit(1);
+});
+process.on("unhandledRejection", (reason) => {
+  console.error("[unhandledRejection]", reason);
+  process.exit(1);
+});
+
 const app = express();
 
 // CORS is handled by the API Gateway
@@ -27,12 +37,17 @@ app.get("/", (req, res) => {
 });
 
 app.use((error, req, res, next) => {
-  console.log(error, error.message);
-  return res.status(400).json({ message: "internal server error in auth service" });
+  console.error(error.stack || error.message);
+  return res.status(error.status || 500).json({
+    message: process.env.NODE_ENV === "production"
+      ? "Internal server error"
+      : error.message,
+  });
 });
 
-app.listen(process.env.PORT, () => {
+const PORT = process.env.PORT || 5001;
+app.listen(PORT, () => {
   console.log(
-    `Auth Service is working at port:${process.env.PORT} in ${process.env.NODE_ENV} mode`
+    `Auth Service is working at port:${PORT} in ${process.env.NODE_ENV} mode`
   );
 });

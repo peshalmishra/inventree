@@ -5,6 +5,16 @@ import { createProxyMiddleware } from "http-proxy-middleware";
 
 dotenv.config();
 
+// Catch any uncaught startup errors so Render logs show the real reason
+process.on("uncaughtException", (err) => {
+  console.error("[uncaughtException]", err);
+  process.exit(1);
+});
+process.on("unhandledRejection", (reason) => {
+  console.error("[unhandledRejection]", reason);
+  process.exit(1);
+});
+
 const app = express();
 
 // Global CORS configuration for the gateway
@@ -65,8 +75,9 @@ app.use((error, req, res, next) => {
   return res.status(500).json({ message: "Gateway error" });
 });
 
-app.listen(process.env.PORT, () => {
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => {
   console.log(
-    `Gateway is running at port:${process.env.PORT} in ${process.env.NODE_ENV} mode`
+    `Gateway is running at port:${PORT} in ${process.env.NODE_ENV} mode`
   );
 });
