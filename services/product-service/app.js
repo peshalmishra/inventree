@@ -8,6 +8,7 @@ import productRouter from "./routes/productRoutes.js";
 import companyRouter from "./routes/companyRoutes.js";
 import locationRouter from "./routes/locationRoutes.js";
 import analyticsRoutes from "./routes/analyticsRoutes.js";
+import "./models/user_model.js";
 
 dotenv.config();
 
