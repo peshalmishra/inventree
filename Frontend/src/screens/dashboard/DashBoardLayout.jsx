@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import HeaderBar from "../../components/HeaderBar";
 import SideNavbar from "../../components/SideNavbar";
 import { SERVER_URL } from "../../router";
-import { Boxes, ShieldCheck, Sparkles, Clock, Database, Layers, CheckCircle2, Package, Tag, MapPin } from "lucide-react";
+import { Boxes, ShieldCheck, Sparkles, Clock, Database, Layers, CheckCircle2, Package, Tag, MapPin, ChevronRight } from "lucide-react";
 
 function DashBoardLayout() {
   const navigator = useNavigate();
