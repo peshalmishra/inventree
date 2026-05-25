@@ -71,7 +71,7 @@ function DashBoardLayout() {
 
   if (!data) {
     return (
-      <div className="min-h-screen overflow-y-auto w-full text-white select-none relative scrollbar-thin" style={{ backgroundColor: "#06060a" }}>
+      <div className="h-screen overflow-y-auto w-full text-white select-none relative scrollbar-thin" style={{ backgroundColor: "#06060a" }}>
         
         {/* Animated Background Blobs */}
         <div className="absolute top-[-10%] left-[-10%] w-[600px] h-[600px] rounded-full bg-purple-600/10 blur-[130px] pointer-events-none" />
