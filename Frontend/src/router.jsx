@@ -19,6 +19,7 @@ import NewBrandsScreen from "./screens/brands/NewBrandsScreen";
 import EditBrandsScreen from "./screens/brands/EditBrandsScreen";
 import UserManagementScreen from "./screens/users/UserManagementScreen";
 import ProductHistoryScreen from "./screens/product/ProductHistoryScreen";
+import AIGenerator from "./screens/dashboard/AIGenerator";
 const router = createBrowserRouter([
   {
     path: "/",
@@ -87,6 +88,10 @@ const router = createBrowserRouter([
       {
         path: "/users",
         element: <UserManagementScreen />,
+      },
+      {
+        path: "/ai-tools",
+        element: <AIGenerator />,
       },
     ],
   },

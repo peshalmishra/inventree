@@ -13,13 +13,17 @@ import {
   Boxes,
   LogOut,
   Settings,
+  Sparkles,
 } from "lucide-react";
 import LogoutButton from "./LogoutButton";
 
 const navGroups = [
   {
     title: "Overview",
-    links: [{ to: "/", name: "Dashboard", icon: LayoutDashboard, end: true }],
+    links: [
+      { to: "/", name: "Dashboard", icon: LayoutDashboard, end: true },
+      { to: "/ai-tools", name: "AI Tools", icon: Sparkles, end: true }
+    ],
   },
   {
     title: "Quick Add",

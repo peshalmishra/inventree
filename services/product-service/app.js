@@ -9,6 +9,7 @@ import companyRouter from "./routes/companyRoutes.js";
 import locationRouter from "./routes/locationRoutes.js";
 import analyticsRoutes from "./routes/analyticsRoutes.js";
 import "./models/user_model.js";
+import aiRouter from "./routes/aiRoutes.js";
 
 dotenv.config();
 
@@ -41,6 +42,7 @@ app.use("/api/v1/products", productRouter);
 app.use("/api/v1/brands", companyRouter);
 app.use("/api/v1/location", locationRouter);
 app.use("/api/v1/analytics", analyticsRoutes);
+app.use("/api/ai", aiRouter);
 
 app.get("/", (req, res) => {
   res.send("<h1>Product Service is working</h1>");

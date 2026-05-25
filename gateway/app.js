@@ -73,6 +73,14 @@ app.use(
     changeOrigin: true,
   })
 );
+
+app.use(
+  "/api/ai",
+  createProxyMiddleware({
+    target: process.env.PRODUCT_SERVICE_URL,
+    changeOrigin: true,
+  })
+);
 app.get("/", (req, res) => {
   res.send("<h1>API Gateway is working</h1>");
 });

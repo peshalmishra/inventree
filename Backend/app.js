@@ -8,6 +8,7 @@ import productRouter from "./routes/productRoutes.js";
 import companyRouter from "./routes/companyRoutes.js";
 import locationRouter from "./routes/locationRoutes.js";
 import analyticsRoutes from "./routes/analyticsRoutes.js";
+import aiRouter from "./routes/ai.js";
 
 dotenv.config();
 
@@ -38,6 +39,7 @@ app.use("/api/v1/products", productRouter);
 app.use("/api/v1/brands", companyRouter);
 app.use("/api/v1/location", locationRouter);
 app.use("/api/v1/analytics", analyticsRoutes);
+app.use("/api/ai", aiRouter);
 
 app.use(express.urlencoded({ extended: true }));
 
