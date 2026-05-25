@@ -76,68 +76,106 @@ const productTemplates = [
 
 const seedDatabase = async () => {
   try {
-    console.log("Connecting to database...");
-    await mongoose.connect(process.env.MONGODB_URI, {
-      dbName: "ims",
-    });
-    console.log("Database connected successfully.");
+    const hashedAdminPassword = await bcrypt.hash("adminpass123", 10);
+    const hashedUserPassword = await bcrypt.hash("userpass123", 10);
 
-    // 1. Seed or reuse Admin/User
-    console.log("Seeding users...");
-    let adminUser = await User.findOne({ email: "admin@ims.com" });
-    if (!adminUser) {
-      const hashedAdminPassword = await bcrypt.hash("adminpass123", 10);
-      adminUser = await User.create({
+    // --- STEP 1: SEED USERS INTO ims_auth ---
+    console.log("Connecting to ims_auth database...");
+    await mongoose.connect(process.env.MONGODB_URI, {
+      dbName: "ims_auth",
+    });
+    console.log("Connected to ims_auth.");
+
+    console.log("Seeding users in ims_auth...");
+    let adminUserAuth = await User.findOne({ email: "admin@ims.com" });
+    if (!adminUserAuth) {
+      adminUserAuth = await User.create({
         name: "Admin User",
         email: "admin@ims.com",
         password: hashedAdminPassword,
         role: "admin",
       });
-      console.log("Admin user created: admin@ims.com / adminpass123");
+      console.log("Admin user created in ims_auth");
     } else {
-      console.log("Admin user already exists, reusing.");
+      console.log("Admin user already exists in ims_auth");
     }
 
-    let regularUser = await User.findOne({ email: "user@ims.com" });
-    if (!regularUser) {
-      const hashedUserPassword = await bcrypt.hash("userpass123", 10);
-      regularUser = await User.create({
+    let regularUserAuth = await User.findOne({ email: "user@ims.com" });
+    if (!regularUserAuth) {
+      regularUserAuth = await User.create({
         name: "Standard User",
         email: "user@ims.com",
         password: hashedUserPassword,
         role: "user",
       });
-      console.log("Standard user created: user@ims.com / userpass123");
+      console.log("Standard user created in ims_auth");
     } else {
-      console.log("Standard user already exists, reusing.");
+      console.log("Standard user already exists in ims_auth");
     }
 
-    // Clear existing Companies, Locations, Products, and Histories to start fresh
-    console.log("Clearing existing Companies, Locations, Products, and Histories...");
+    await mongoose.connection.close();
+    console.log("Closed connection to ims_auth.\n");
+
+    // --- STEP 2: SEED DATA INTO ims_product ---
+    console.log("Connecting to ims_product database...");
+    await mongoose.connect(process.env.MONGODB_URI, {
+      dbName: "ims_product",
+    });
+    console.log("Connected to ims_product.");
+
+    console.log("Seeding users in ims_product...");
+    let adminUserProd = await User.findOne({ email: "admin@ims.com" });
+    if (!adminUserProd) {
+      adminUserProd = await User.create({
+        name: "Admin User",
+        email: "admin@ims.com",
+        password: hashedAdminPassword,
+        role: "admin",
+      });
+      console.log("Admin user created in ims_product");
+    } else {
+      console.log("Admin user already exists in ims_product, reusing.");
+    }
+
+    let regularUserProd = await User.findOne({ email: "user@ims.com" });
+    if (!regularUserProd) {
+      regularUserProd = await User.create({
+        name: "Standard User",
+        email: "user@ims.com",
+        password: hashedUserPassword,
+        role: "user",
+      });
+      console.log("Standard user created in ims_product");
+    } else {
+      console.log("Standard user already exists in ims_product, reusing.");
+    }
+
+    // Clear existing Companies, Locations, Products, and Histories in ims_product to start fresh
+    console.log("Clearing existing Companies, Locations, Products, and Histories in ims_product...");
     await Company.deleteMany({});
     await Location.deleteMany({});
     await Product.deleteMany({});
     await History.deleteMany({});
 
-    // 2. Seed Companies
-    console.log("Seeding companies...");
+    // Seed Companies
+    console.log("Seeding companies in ims_product...");
     const companyDocs = [];
     for (const manufacturer of manufacturers) {
       const doc = await Company.create({
         ...manufacturer,
-        createdBy: adminUser._id,
+        createdBy: adminUserProd._id,
       });
       companyDocs.push(doc);
     }
     console.log(`Successfully seeded ${companyDocs.length} companies.`);
 
-    // 3. Seed Locations
-    console.log("Seeding locations...");
+    // Seed Locations
+    console.log("Seeding locations in ims_product...");
     const locationDocs = [];
     for (const loc of locations) {
       const doc = await Location.create({
         ...loc,
-        createdBy: adminUser._id,
+        createdBy: adminUserProd._id,
       });
       locationDocs.push(doc);
     }
@@ -150,48 +188,36 @@ const seedDatabase = async () => {
       return matched ? matched._id : companyDocs[Math.floor(Math.random() * companyDocs.length)]._id;
     };
 
-    // 4. Seed Products and History
-    console.log("Seeding 120 products and history records...");
+    // Seed Products and History
+    console.log("Seeding 120 products and history records in ims_product...");
     const productsToInsert = [];
-    
-    // We will generate 120 items
     const totalItems = 120;
     const statuses = ["in use", "repair", "not in use"];
     const userRoles = ["normal user", "department", "admin"];
 
     for (let i = 1; i <= totalItems; i++) {
-      // Pick a random template
       const template = productTemplates[i % productTemplates.length];
-      
-      // Determine serial number, model suffix, etc.
       const serialNo = `SN-${template.category.substring(0, 3).toUpperCase()}-${100000 + i}`;
       const title = `${template.title} #${i}`;
       
-      // Generate a date of purchase within the last 3 years
       const dateOfPurchase = new Date();
       dateOfPurchase.setMonth(dateOfPurchase.getMonth() - Math.floor(Math.random() * 36));
 
-      // Warranty: 12, 24, 36, or 60 months
       const warrantyMonths = [12, 24, 36, 60][Math.floor(Math.random() * 4)];
-      
-      // Pick a random location
       const randomLocation = locationDocs[Math.floor(Math.random() * locationDocs.length)];
-      
-      // Pick a random status
       const randomStatus = statuses[Math.floor(Math.random() * statuses.length)];
 
-      // Create History record first
+      // Create History record
       const historyDoc = await History.create({
         location: randomLocation._id,
         status: [
           {
             name: randomStatus,
-            date: new Date(dateOfPurchase.getTime() + 24 * 60 * 60 * 1000), // Day after purchase
+            date: new Date(dateOfPurchase.getTime() + 24 * 60 * 60 * 1000),
           }
         ]
       });
 
-      // Product data
       const manufacturerId = getManufacturerId(template.title);
       const assignedUser = userRoles[Math.floor(Math.random() * userRoles.length)];
 
@@ -199,7 +225,7 @@ const seedDatabase = async () => {
         title,
         description: `${template.description} (Seeded Item #${i})`,
         serialNo,
-        createdBy: adminUser._id,
+        createdBy: adminUserProd._id,
         rackMountable: template.rackMountable,
         isPart: template.isPart,
         manufacturer: manufacturerId,
@@ -213,11 +239,10 @@ const seedDatabase = async () => {
       productsToInsert.push(productDoc);
     }
 
-    // Insert all products
     const seededProducts = await Product.insertMany(productsToInsert);
-    console.log(`Successfully seeded ${seededProducts.length} products.`);
+    console.log(`Successfully seeded ${seededProducts.length} products into ims_product.`);
 
-    console.log("Database seeding completed successfully!");
+    console.log("Database seeding completed successfully for both ims_auth and ims_product!");
   } catch (error) {
     console.error("Error seeding database:", error);
   } finally {
