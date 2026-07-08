@@ -1,246 +1,186 @@
- 
-# Inventory Management System (IMS)
+ # Inventory Management System (IMS)
 
-An Inventory Management System built with Vite, React.js for the frontend, and Node.js, Express, and MongoDB for the backend.
+A full-stack inventory management application built with the MERN stack and enhanced with AI-powered product support features. The project helps businesses manage products, users, locations, companies, and inventory insights in a modern web interface.
 
-## Table of Contents
+## Overview
 
-- [Features](#features)
-- [Folder Structure](#folder-structure)
-- [Prerequisites](#prerequisites)
-- [Installation](#installation)
-- [Running the Application](#running-the-application)
-- [Environment Variables](#environment-variables)
-- [API Endpoints](#api-endpoints)
-- [Contributing](#contributing)
-- [License](#license)
+This application combines a React-based frontend, a Node.js/Express backend, and a MongoDB database to provide a practical inventory solution for small to medium-sized businesses. It supports authentication, product CRUD operations, analytics, and AI-generated content such as product descriptions, tags, captions, pricing suggestions, and trending product ideas.
 
-## Features
+## Key Features
 
-- User authentication and authorization
-- Manage products, companies, locations, and brands
-- Track product history
-- Dashboard with analytics
-- Responsive design with Tailwind CSS
+- User registration, login, and protected routes
+- Product management with create, read, update, and delete operations
+- Company and location management
+- Product history tracking
+- Analytics dashboard for inventory insights
+- AI-powered content generation for product marketing
+- Responsive UI built with Tailwind CSS
+- Docker and Kubernetes deployment support
 
-## Folder Structure
+## Tech Stack
 
-```plaintext
-C:.
-├───Backend
-│   │   .env
-│   │   .gitignore
-│   │   app.js
-│   │   config.npmrc
-│   │   package-lock.json
-│   │   package.json
-│   │   README.md
-│   │
-│   ├───controllers
-│   │       product_controller.js
-│   │       user_controllers.js
-│   │
-│   ├───db
-│   │       user_db.js
-│   │
-│   ├───middlewares
-│   │       user_auth.js
-│   │
-│   ├───models
-│   │       company_model.js
-│   │       history_model.js
-│   │       locations_models.js
-│   │       product_model.js
-│   │       user_model.js
-│   │
-│   ├───routes
-│   │       analyticsRoutes.js
-│   │       companyRoutes.js
-│   │       historyRoutes.js
-│   │       locationRoutes.js
-│   │       productRoutes.js
-│   │       user_routes.js
-│   │
-│   └───utils
-│           user_utils.js
-│
-└───Frontend
-    │   .env
-    │   .eslintrc.cjs
-    │   .gitignore
-    │   index.html
-    │   package-lock.json
-    │   package.json
-    │   postcss.config.js
-    │   README.md
-    │   tailwind.config.js
-    │   vite.config.js
-    │
-    ├───public
-    │       vite.svg
-    │
-    └───src
-        │   App.jsx
-        │   index.css
-        │   main.jsx
-        │   router.jsx
-        │
-        ├───assets
-        │       admin-logo.svg
-        │       authenticate.svg
-        │       menu.svg
-        │       react.svg
-        │       undraw_empty_re.svg
-        │       user-logo.svg
-        │
-        ├───components
-        │       HeaderBar.jsx
-        │       LoadingIndicator.jsx
-        │       LogoutButton.jsx
-        │       PopUpComponenet.jsx
-        │       ShowErrorMessage.jsx
-        │       ShowSuccessMesasge.jsx
-        │       SideNavbar.jsx
-        │       WarrantyExpiringProductsTableComponent.jsx
-        │
-        └───screens
-            │   InventoryFormScreen.jsx
-            │
-            ├───brands
-            │       BrandsScreen.jsx
-            │       EditBrandsScreen.jsx
-            │       NewBrandsScreen.jsx
-            │
-            ├───dashboard
-            │   │   DashBoardLayout.jsx
-            │   │   DashBoardScreen.jsx
-            │   │
-            │   └───components
-            │           AnalyticsComponent.jsx
-            │           PieChart.jsx
-            │
-            ├───locations
-            │       EditLocationScreen.jsx
-            │       LocationsScreen.jsx
-            │       NewLocationScreen.jsx
-            │
-            ├───login
-            │       AuthLayout.jsx
-            │       LoginScreen.jsx
-            │       SignupScreen.jsx
-            │
-            ├───product
-            │       AddNewProductScreen.jsx
-            │       ProductEditScreen.jsx
-            │       ProductHistoryScreen.jsx
-            │       ProductInfoScreen.jsx
-            │       ProductsScreen.jsx
-            │
-            └───users
-                │   UserManagementScreen.jsx
-                │
-                └───components
-                        ChangeRolePopup.jsx
-                        ManageUserTableRow.jsx
+### Frontend
+- React.js
+- Vite
+- Tailwind CSS
+- React Router DOM
+- Axios
+- Recharts / Chart.js
+- Framer Motion
+
+### Backend
+- Node.js
+- Express.js
+- MongoDB
+- Mongoose
+- JWT Authentication
+- bcrypt
+- cookie-parser
+- CORS
+
+### AI Integration
+- Google Gemini via the Google Generative AI SDK
+- Prompt-based generation for:
+  - product descriptions
+  - SEO tags
+  - social captions
+  - pricing recommendations
+  - trending product ideas
+
+## Project Structure
+
+```text
+Inventory-Management-System-MERN-Stack-main/
+├── Backend/
+│   ├── controllers/
+│   ├── db/
+│   ├── middlewares/
+│   ├── models/
+│   ├── routes/
+│   ├── utils/
+│   ├── app.js
+│   └── package.json
+├── Frontend/
+│   ├── public/
+│   ├── src/
+│   │   ├── components/
+│   │   ├── screens/
+│   │   ├── App.jsx
+│   │   └── router.jsx
+│   ├── package.json
+│   └── vite.config.js
+├── gateway/
+├── services/
+├── k8s/
+├── docker-compose.yml
+└── Readme.md
 ```
 
 ## Prerequisites
 
-- Node.js
+- Node.js 18+
 - npm or yarn
-- MongoDB
+- MongoDB instance
+- Gemini API key (for AI features)
 
 ## Installation
 
-1. **Clone the repository:**
+1. Clone the repository
    ```bash
-   git clone https://github.com/your-username/your-repo.git
-   cd your-repo
+   git clone <your-repository-url>
+   cd Inventory-Management-System-MERN-Stack-main
    ```
 
-2. **Backend Setup:**
+2. Install backend dependencies
    ```bash
    cd Backend
    npm install
    ```
 
-3. **Frontend Setup:**
+3. Install frontend dependencies
    ```bash
    cd ../Frontend
    npm install
-   ```
-
-## Running the Application
-
-1. **Run Backend:**
-   ```bash
-   cd Backend
-   npm start
-   ```
-
-2. **Run Frontend:**
-   ```bash
-   cd ../Frontend
-   npm run dev
    ```
 
 ## Environment Variables
 
-Create a `.env` file in the Backend and Frontend directories and configure the following:
+Create a `.env` file in the Backend directory with values similar to:
 
-### Backend `.env`:
 ```env
-MONGODB_URI=your_mongodb_connection_string
 PORT=3000
-SECRET_KEY=your_secret_key
 NODE_ENV=development
+MONGODB_URI=your_mongodb_connection_string
+SECRET_KEY=your_secret_key
+GEMINI_API_KEY=your_gemini_api_key
 ORIGIN=http://localhost:3000
 ```
 
-### Frontend `.env`:
+For the frontend, create a `.env` file in the Frontend directory if needed:
+
 ```env
-VITE_SERVER=https://inventory-management-backend-hsaf.onrender.com
-VITE_MODE=PROD
+VITE_SERVER=http://localhost:3000
+VITE_MODE=DEV
 VITE_LOCAL=http://localhost:3000
 ```
 
-## API Endpoints
+## Running the Application
 
-### User Routes
+### Start the backend
+```bash
+cd Backend
+npm start
+```
 
-- **POST** `/api/v1/users/signup` - Sign up a new user
-- **POST** `/api/v1/users/login` - Log in a user
-- **GET** `/api/v1/users/logout` - Log out a user
+### Start the frontend
+```bash
+cd Frontend
+npm run dev
+```
 
-### Product Routes
+## API Overview
 
-- **GET** `/api/v1/products` - Get all products
-- **POST** `/api/v1/products` - Add a new product
-- **PUT** `/api/v1/products/:id` - Update a product
-- **DELETE** `/api/v1/products/:id` - Delete a product
+### Authentication
+- POST `/api/v1/users/signup`
+- POST `/api/v1/users/login`
+- GET `/api/v1/users/logout`
 
-### History Routes
+### Products
+- GET `/api/v1/products`
+- POST `/api/v1/products`
+- PUT `/api/v1/products/:id`
+- DELETE `/api/v1/products/:id`
 
-- **GET** `/api/v1/history/:productId` - Get product history
+### Companies and Locations
+- GET/POST `/api/v1/brands`
+- GET/POST `/api/v1/location`
 
-### Company Routes
+### Analytics
+- GET `/api/v1/analytics`
 
-- **GET** `/api/v1/companies` - Get all companies
-- **POST** `/api/v1/companies` - Add a new company
+### AI Routes
+- POST `/api/ai/generate-description`
+- POST `/api/ai/generate-tags`
+- POST `/api/ai/generate-caption`
+- POST `/api/ai/recommend-price`
+- POST `/api/ai/trending`
 
-### Location Routes
+## AI Features
 
-- **GET** `/api/v1/locations` - Get all locations
-- **POST** `/api/v1/locations` - Add a new location
+The AI module is built around prompt-based generation using Gemini. It can help users:
 
-### Analytics Routes
+- write polished product descriptions
+- create SEO-friendly tags
+- draft social media captions
+- estimate pricing using margin and competitor inputs
+- suggest trending product ideas by category
 
-- **GET** `/api/v1/analytics` - Get analytics data
+The backend includes graceful fallback logic so that if the AI service is unavailable, the app still returns useful mock responses instead of failing completely.
 
-## Contributing
+## Deployment Notes
 
-Contributions are welcome! Please open an issue or submit a pull request for any changes.
+The repository includes Docker and Kubernetes configuration files for container-based deployment. The structure also suggests a modular service-oriented approach with a gateway and separate service folders.
 
 ## License
 
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+This project is intended for educational and demonstration purposes. Please review the repository license before commercial use.
