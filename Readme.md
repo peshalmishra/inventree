@@ -1,4 +1,4 @@
- # Inventory Management System (IMS)
+ # INVENTREE - Inventory Management System (IMS)
 
 A full-stack inventory management application built with the MERN stack and enhanced with AI-powered product support features. The project helps businesses manage products, users, locations, companies, and inventory insights in a modern web interface.
 
